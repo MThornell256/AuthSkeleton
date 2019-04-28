@@ -7,12 +7,13 @@
     "build": "webpack",
     "build:dev": "webpack -w --mode=development",
     "start": "node ./build/bundle.js",
-    "start:dev": "nodemon .\\build\\bundle.js"
+    "start:dev": "nodemon --inspect .\\build\\bundle.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.16.1",
+    "@types/jsonwebtoken": "^8.3.2",
     "@types/node": "^11.13.7",
     "@types/pg": "^7.4.14",
     "ts-loader": "^5.4.3",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^7.10.0"
   }
 }

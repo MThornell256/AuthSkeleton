@@ -1,0 +1,5 @@
+TODO:
+
+Setup TS Lint To Work Properly
+Why Dosnt my typescript services use this keyword in classes
+Look up how es6 Modules Work

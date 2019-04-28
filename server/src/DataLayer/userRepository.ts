@@ -6,6 +6,7 @@ import { QueryResult } from "pg";
 export interface User {
     id: number;
     username: string;
+    password: string;
 }
 
 export class UserRepository implements IRepository<User> {

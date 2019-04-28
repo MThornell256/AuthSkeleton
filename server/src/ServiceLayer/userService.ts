@@ -1,10 +1,19 @@
-import { UserRepository } from "../DataLayer/userRepository";
+//import { User } from "../DataLayer/userRepository";
 
-export class userService {
+export class UserService {
 
-    private userRepository: UserRepository = new UserRepository();
+    //private userRepository: UserRepository = new UserRepository();
 
     createUser(userName: string): void {
         // ??
+    }
+
+    getUserByUsername(username: string): any {
+
+        return {
+            id: 9000,
+            username: 'myUsername',
+            password: 'myPassword123_'
+        };
     }
 }
