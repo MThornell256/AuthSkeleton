@@ -1,13 +1,8 @@
-import { IRepository } from "./repository";
-import { Database } from "./database";
-import { response } from "express";
 import { QueryResult } from "pg";
 
-export interface User {
-    id: number;
-    username: string;
-    password: string;
-}
+import { IRepository } from "./repository";
+import { Database } from "./database";
+import { User } from "../Model/user";
 
 export class UserRepository implements IRepository<User> {
 

@@ -1,10 +1,12 @@
 import * as express from "express";
 import { Request, Response } from "express";
-import * as path from "path";
 import { Server } from "net";
+import * as bodyParser from "body-parser";
+import * as path from "path";
 
-import { NextFunction } from "connect";
 import { AuthController } from "./src/ApiControllers/authController";
+import { ErrorController } from "./src/ApiControllers/errorController";
+import { UserController } from "./src/ApiControllers/userController";
 
 // Webpack + Typescript + Express + NodeJS Example
 // Also has unit test examples
@@ -13,40 +15,33 @@ import { AuthController } from "./src/ApiControllers/authController";
 const PORT: number = parseInt(process.env.PORT) || 3000;
 const app = express();
 
-app.get("/error", (request: Request, response: Response) => {
-    throw Error('My Error Message')
-})
+// Parse the json and assign it to:
+// request.body
+const jsonParserOptions: bodyParser.OptionsJson = {
+}
+app.use(bodyParser.json(jsonParserOptions));
 
-app.get("/auth", new AuthController().login);
+// Create Controllers
+const authController = new AuthController();
+const userController = new UserController();
+const errorController = new ErrorController();
 
+// Authenticate User
+app.post("/login", authController.login);
+app.post("/signup", authController.login);
 
+// Apply Authentication to the API
+app.use('/api/*', authController.authenticate);
 
-app.post("/secure", new AuthController().authenticate, (request: Request, response: Response) => {
-    response.send("SECURE RESOURCE POST");
-});
+// User Endpoints
+app.get('/api/user', userController.getUsers);
+app.post('/api/user', userController.createUser);
+app.patch('/api/user', userController.updateUser);
+app.delete('/api/user', userController.deleteUser);
+app.get('/api/user/*', userController.getUser);
 
-app.get("/secure", new AuthController().authenticate, (request: Request, response: Response) => {
-    response.send("SECURE RESOURCE GET");
-});
+// Error handlers
+app.use(errorController.notFoundError);
+app.use(errorController.error);
 
-// 404 Not Found handler
-app.use((request: Request, response: Response, next: NextFunction) => {
-    
-    response
-    .status(404)
-    .send("[Error: 404]");
-});
-
-// Error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-
-    console.log('Error Handler')
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-  
-    // render the error page
-    res.status(err.status || 500);
-    res.send(res.locals.message + res.locals.error);
-  });
-
-  const server: Server = app.listen(PORT);
+const server: Server = app.listen(PORT);

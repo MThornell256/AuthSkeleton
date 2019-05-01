@@ -1,7 +1,8 @@
 import * as jwt from 'jsonwebtoken'
-import { User } from '../DataLayer/userRepository';
 
-export interface ITokenData {
+import { User } from '../Model/user';
+
+export interface TokenData {
     id: number,
     username:string,
 }
@@ -12,7 +13,7 @@ export class AuthService {
 
     getToken(user: User): string {
 
-        const payload: ITokenData = { 
+        const payload: TokenData = { 
             id: user.id, 
             username: user.username 
         };
@@ -24,13 +25,13 @@ export class AuthService {
         return jwt.sign({user}, this.SECRET_KEY, tokenOptions);
     }
 
-    authenticate(token: string): ITokenData {
+    authenticate(token: string): TokenData {
 
         const verifyOptions: jwt.VerifyOptions = {
 
         }
 
-        const result = jwt.verify(token, this.SECRET_KEY, verifyOptions) as ITokenData;
+        const result = jwt.verify(token, this.SECRET_KEY, verifyOptions) as TokenData;
         return result;
     }
 }

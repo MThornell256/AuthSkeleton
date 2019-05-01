@@ -1,62 +1,58 @@
-import { Express, Request, Response } from 'express';
-import { User } from '../DataLayer/userRepository';
-import { AuthService } from '../ServiceLayer/authService';
+import { Request, Response } from 'express';
+
+import { AuthService, TokenData } from '../ServiceLayer/authService';
 import { UserService } from '../ServiceLayer/userService';
-import { NextFunction } from 'connect';
+import { User } from '../Model/user';
+import { ControllerError } from './errorController';
 
-
+interface IAuthRequest extends Request {
+    tokenData: TokenData
+}
 export class AuthController {
 
-    // authService: AuthService; 
-    // userService: UserService;
+    authService: AuthService; 
+    userService: UserService;
 
     constructor() {
-        // this.authService = new AuthService();
-        // this.userService = new UserService();
+        this.authService = new AuthService();
+        this.userService = new UserService();
     }
     
-    login (request: Request, response: Response, next: NextFunction) {
+    login = (request: Request, response: Response, next: Function) => {
         
-        const authService = new AuthService(); 
-        const userService = new UserService();
-
         console.log("login function")
+        const username = request.body.username;
+        const password = request.body.password;
         
-        const username = 'myUsername';//request.headers['username'];
-        const password = 'myPassword123_';//request.headers['password'];
-        
-        //console.log(this.userService)
-        //this.userService = new UserService();
-        const user = userService.getUserByUsername(username);
-        console.log("user1");
+        const user = this.userService.getUserByUsername(username);
+
         // Validate Password
         if(!user || password !== user.password) {
             // Error - username or password is incorrect
-            console.log("fail result")
             response.status(401).json({error: 'error- unauth'})
+            return;
         }
 
         // Issue Token
-        console.log("success result")
-        const token = authService.getToken({username: "", id: 123} as User)
-        console.log("token")
+        const token = this.authService.getToken({username: "", id: 123} as User)
         response.json({token});
     }
     
-    authenticate (request: Request, response: Response, next: NextFunction) {
+    authenticate = (request: IAuthRequest, response: Response, next: Function) => {
 
-        //console.log(request.headers);
-        const token = request.header("auth");
-
-        const tokenData = new AuthService().authenticate(token);
-
-        if(!tokenData) {
-            // Error
-            response
-                .status(401)
-                .send("ERROR: UNAUTH")
+        try {
+            const bearerToken = request.header("authorization");
+            const token = bearerToken.split(' ')[1];
+            request.tokenData = this.authService.authenticate(token);
         }
-        
+        catch (err) {
+            throw {
+                message: err.message,
+                status: 401,
+                stack: err.stack
+            } as ControllerError;
+        }
+
         next();
     }
 
