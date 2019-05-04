@@ -24,18 +24,20 @@ export class AuthController {
         const username = request.body.username;
         const password = request.body.password;
         
-        const user = this.userService.getUserByUsername(username);
+        this.userService.getUserByUsername(username)
+            .then(user => {
 
-        // Validate Password
-        if(!user || password !== user.password) {
-            // Error - username or password is incorrect
-            response.status(401).json({error: 'error- unauth'})
-            return;
-        }
+                // Validate Password
+                // if(!user || password !== user.password) {
+                //     // Error - username or password is incorrect
+                //     response.status(401).json({error: 'error- unauth'})
+                //     return;
+                // }
 
-        // Issue Token
-        const token = this.authService.getToken({username: "", id: 123} as User)
-        response.json({token});
+                // Issue Token
+                const token = this.authService.getToken({username: "", userid: 123} as User)
+                response.json({token});
+            });
     }
     
     authenticate = (request: IAuthRequest, response: Response, next: Function) => {

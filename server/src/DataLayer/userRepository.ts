@@ -1,42 +1,58 @@
-import { QueryResult } from "pg";
-
-import { IRepository } from "./repository";
-import { Database } from "./database";
 import { User } from "../Model/user";
+import { UserDto } from "../Bootstrapers/sequelizeBootstrap";
+import { QueryResult } from "pg";
+import { DestroyOptions } from "sequelize";
 
-export class UserRepository implements IRepository<User> {
+export class UserRepository {
+    //implements IRepository<User> {
 
-    private tableName: string = 'users';
-    private database: Database = new Database();
-    
-    async get(id: number): Promise<User> {
-        return this.database
-            .get(this.tableName, id)
-            .then((response: QueryResult) => {
-                return response.rows[0];
-            });
+    private usersContext = UserDto;
+
+    mapResult(result: QueryResult[]): User[] {
+        return result.map((result: any) => {
+            return {
+                userid: result.dataValues.userid,
+                username: result.dataValues.username,
+                password: result.dataValues.password
+            } as User;
+        });
     }
 
-    list(): Promise<User[]> {
-        return this.database
-            .list(this.tableName)
-            .then((response: QueryResult) => {
-                return response.rows;
-            });
-    }
-    
-    insert(data: User): Promise<User> {
-        return null;
+    get(filterOptions?: User): Promise<User[]> {
+
+        const bbPromise = this.usersContext
+            .findAll({
+                attributes: ["userid", "username", "password"],
+                where: filterOptions
+            })
+            .then(
+                (dtoResults: QueryResult[]) => this.mapResult(dtoResults)
+            );
+
+        return Promise.resolve(bbPromise);
     }
 
-    update(data: User): Promise<User> {
-        return null;
+    upsert(data: User): Promise<User[]> {
+
+        const bbPromise = this.usersContext
+            .upsert(data, {
+                returning: true
+            })
+            .then((dtoResults: [QueryResult, boolean]) => this.mapResult([dtoResults[0]]));
+
+        return Promise.resolve(bbPromise);
     }
 
     delete(id: number): Promise<boolean> {
+
+        const options: DestroyOptions = {
+            where: { userid: id }
+        }
         
-        return null;
-        // return this.database
-        //     .delete(this.tableName, id)
+        const bbPromise = this.usersContext
+            .destroy(options)
+            .then(result => result > 0)
+        
+        return Promise.resolve(bbPromise);
     }
 }

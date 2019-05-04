@@ -14,7 +14,7 @@ export class AuthService {
     getToken(user: User): string {
 
         const payload: TokenData = { 
-            id: user.id, 
+            id: user.userid, 
             username: user.username 
         };
 

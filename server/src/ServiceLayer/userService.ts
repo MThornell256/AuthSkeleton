@@ -6,47 +6,42 @@ export class UserService {
     private userRepository: UserRepository;
 
     constructor() {
-        
+
         this.userRepository =  new UserRepository();
     }
 
-    createUser = (username: string, password: string): Promise<User> => {
+    createUser = (username: string, password: string): Promise<User[]> => {
 
         const newUser: User = {
-            id: 0,
             username,
             password
         };
 
-        return this.userRepository.insert(newUser)
+        return this.userRepository.upsert(newUser);
     }
 
     getUsers(): Promise<User[]> {
-        
-        return null;
+
+        return this.userRepository.get();
     }
 
-    getUserById(userId: number): Promise<User> {
-        return null;
+    getUserById(userid: number): Promise<User[]> {
+
+        return this.userRepository.get({ userid });
     }
 
-    getUserByUsername(username: string): Promise<User> {
+    getUserByUsername(username: string): Promise<User[]> {
 
-        const user = {
-            username
-        } as User;
-
-        //this.userRepository.get(user)
-        return null;
+        return this.userRepository.get({ username });
     }
 
-    updateUser(user: User): Promise<User> {
+    updateUser(user: User): Promise<User[]> {
 
-        return null;
+        return this.userRepository.upsert(user);
     }
 
     deleteUser(id: number): Promise<boolean> {
 
-        return null;
+        return this.userRepository.delete(id);
     }
 }

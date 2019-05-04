@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from "../ServiceLayer/userService";
+import { User } from '../Model/user';
 
 export class UserController {
 
@@ -12,33 +13,55 @@ export class UserController {
 
     createUser = (request: Request, response: Response, next: Function) => {
 
-        response.send('create User');
+        const username = request.body.username;
+        const password = request.body.password;
+
+        this.userService.createUser(username, password)
+            .then(result => response.json(result));
     }
 
     deleteUser = (request: Request, response: Response, next: Function) => {
 
-        response.send('delete User');
+        const userid = request.body.userid;
+
+        this.userService.deleteUser(userid)
+            .then(result => response.json(result));
     }
 
     updateUser = (request: Request, response: Response, next: Function) => {
 
-        response.send('update User');
+        const user: User = request.body;
+
+        this.userService.updateUser(user)
+            .then(result => response.json(result));
     }
 
     getUser = (request: Request, response: Response, next: Function): void => {
 
-        const id = request.query['id'];
-        const username = request.query['username'];
+        const user: User = {
+            userid: request.query['userid'],
+            username: request.query['username'],
+        }
 
-        const urlTokens = request.url
-            .split('/')
-            .filter((x)=> x.length > 0);
-
-        response.send('get User');
+        let query;
+        if((user.userid && user.username) || (!user.userid && !user.password)) {
+            
+            throw Error('cant filter on two/no unique criteria');
+        } else if (user.userid) {
+            
+            query = this.userService.getUserById(user.userid);
+        } else if (user.username) {
+            
+            query = this.userService.getUserByUsername(user.username);
+        }
+        
+        query
+            .then(result => response.json(result));
     }
 
     getUsers = (request: Request, response: Response, next: Function): void => {
 
-        response.send('get Users');
+        this.userService.getUsers()
+            .then(users => response.json(users));
     }
 }
