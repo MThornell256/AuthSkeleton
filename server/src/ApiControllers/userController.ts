@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
-import { UserService } from "../ServiceLayer/userService";
+import { IUserService } from "../ServiceLayer/userService";
 import { User } from '../Model/user';
+import { container } from '../Bootstrapers/inversifyBootstrap';
 
 export class UserController {
 
-    private userService: UserService;
+    private userService: IUserService;
 
     constructor() {
 
-        this.userService = new UserService();
+        this.userService = container.get("IUserService") as IUserService;
     }
 
     createUser = (request: Request, response: Response, next: Function) => {

@@ -1,9 +1,7 @@
 import * as express from "express";
-import { Request, Response } from "express";
-import { Server } from "net";
 import * as bodyParser from "body-parser";
-import * as path from "path";
 
+import { Server } from "net";
 import { AuthController } from "./src/ApiControllers/authController";
 import { ErrorController } from "./src/ApiControllers/errorController";
 import { UserController } from "./src/ApiControllers/userController";

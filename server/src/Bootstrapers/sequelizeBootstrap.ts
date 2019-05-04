@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 
 // Sequelize Docs
 // http://docs.sequelizejs.com/

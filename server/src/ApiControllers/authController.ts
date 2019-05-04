@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-
 import { AuthService, TokenData } from '../ServiceLayer/authService';
-import { UserService } from '../ServiceLayer/userService';
+import { IUserService } from '../ServiceLayer/userService';
 import { User } from '../Model/user';
 import { ControllerError } from './errorController';
+import { container } from '../Bootstrapers/inversifyBootstrap';
 
 interface IAuthRequest extends Request {
     tokenData: TokenData
@@ -11,11 +11,11 @@ interface IAuthRequest extends Request {
 export class AuthController {
 
     authService: AuthService; 
-    userService: UserService;
+    userService: IUserService;
 
     constructor() {
         this.authService = new AuthService();
-        this.userService = new UserService();
+        this.userService = container.get("IUserService") as IUserService;
     }
     
     login = (request: Request, response: Response, next: Function) => {

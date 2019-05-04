@@ -1,13 +1,23 @@
-import { UserRepository } from "../DataLayer/userRepository";
+import { inject, injectable } from "inversify";
+import { IUserRepository } from "../DataLayer/userRepository";
 import { User } from "../Model/user";
 
-export class UserService {
+export interface IUserService {
+    createUser: (username: string, password: string) => Promise<User[]>
+    getUsers: () => Promise<User[]> 
+    getUserById: (userid: number) => Promise<User[]> 
+    getUserByUsername: (username: string) => Promise<User[]> 
+    updateUser: (user: User) => Promise<User[]> 
+    deleteUser: (id: number) => Promise<boolean> 
 
-    private userRepository: UserRepository;
+}
 
-    constructor() {
+@injectable()
+export class UserService implements IUserService {
 
-        this.userRepository =  new UserRepository();
+    constructor(
+        @inject('IUserRepository') private userRepository: IUserRepository
+    ) {
     }
 
     createUser = (username: string, password: string): Promise<User[]> => {

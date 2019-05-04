@@ -1,12 +1,22 @@
+import { injectable } from "inversify";
 import { User } from "../Model/user";
 import { UserDto } from "../Bootstrapers/sequelizeBootstrap";
 import { QueryResult } from "pg";
-import { DestroyOptions } from "sequelize";
+import { DestroyOptions, Model } from "sequelize";
 
-export class UserRepository {
-    //implements IRepository<User> {
+export interface IUserRepository {
+    get: (filterOptions?: User) => Promise<User[]>;
+    upsert: (data: User) => Promise<User[]>;
+    delete: (id: number) => Promise<boolean>;
+}
 
+@injectable()
+export class UserRepository implements IUserRepository {
+        
     private usersContext = UserDto;
+
+    constructor() {
+    }
 
     mapResult(result: QueryResult[]): User[] {
         return result.map((result: any) => {
@@ -51,7 +61,7 @@ export class UserRepository {
         
         const bbPromise = this.usersContext
             .destroy(options)
-            .then(result => result > 0)
+            .then((result: number) => (result > 0))
         
         return Promise.resolve(bbPromise);
     }
