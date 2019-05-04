@@ -1,4 +1,10 @@
+import { injectable } from "inversify";
 import { Request, Response } from 'express';
+
+export interface IErrorController {
+    notFoundError: (request: Request, response: Response, next: Function) => void
+    error: (error: any, request: Request, response: Response, next: Function) => void
+}
 
 export interface ControllerError {
 
@@ -7,7 +13,8 @@ export interface ControllerError {
     stack: string,
 }
 
-export class ErrorController {
+@injectable()
+export class ErrorController implements IErrorController {
 
     notFoundError = (request: Request, response: Response, next: Function) => {
         throw {
@@ -16,14 +23,14 @@ export class ErrorController {
         };
     }
 
-    error = (err: any, req: Request, res: Response, next: Function) => {
+    error = (error: any, req: Request, res: Response, next: Function) => {
         console.log('Error Handler');
 
-        res.status(err.status || 500);
+        res.status(error.status || 500);
         res.json({
-            message: err.message,
-            status: err.status,
-            stackTrace: err.stack
+            message: error.message,
+            status: error.status,
+            stackTrace: error.stack
         });
     }
 }

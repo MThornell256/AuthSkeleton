@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { IUserRepository } from "../DataLayer/userRepository";
-import { User } from "../Model/user";
+import { User } from "../Models/user";
 
 export interface IUserService {
     createUser: (username: string, password: string) => Promise<User[]>
     getUsers: () => Promise<User[]> 
-    getUserById: (userid: number) => Promise<User[]> 
-    getUserByUsername: (username: string) => Promise<User[]> 
+    getUserById: (userid: number) => Promise<User> 
+    getUserByUsername: (username: string) => Promise<User> 
     updateUser: (user: User) => Promise<User[]> 
     deleteUser: (id: number) => Promise<boolean> 
 
@@ -35,14 +35,16 @@ export class UserService implements IUserService {
         return this.userRepository.get();
     }
 
-    getUserById(userid: number): Promise<User[]> {
+    getUserById(userid: number): Promise<User> {
 
-        return this.userRepository.get({ userid });
+        return this.userRepository.get({ userid })
+            .then(users => users[0]);
     }
 
-    getUserByUsername(username: string): Promise<User[]> {
+    getUserByUsername(username: string): Promise<User> {
 
-        return this.userRepository.get({ username });
+        return this.userRepository.get({ username })
+            .then(users => users[0]);
     }
 
     updateUser(user: User): Promise<User[]> {

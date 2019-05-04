@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
-import { User } from "../Model/user";
-import { UserDto } from "../Bootstrapers/sequelizeBootstrap";
 import { QueryResult } from "pg";
-import { DestroyOptions, Model } from "sequelize";
+import { DestroyOptions } from "sequelize";
+import { UserDto } from "../Bootstrapers/sequelizeBootstrap";
+import { User } from "Models/user";
 
 export interface IUserRepository {
     get: (filterOptions?: User) => Promise<User[]>;

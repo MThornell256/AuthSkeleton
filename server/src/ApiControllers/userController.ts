@@ -1,18 +1,27 @@
+import { inject, injectable } from "inversify";
 import { Request, Response } from 'express';
+import { User } from '../Models/user';
 import { IUserService } from "../ServiceLayer/userService";
-import { User } from '../Model/user';
-import { container } from '../Bootstrapers/inversifyBootstrap';
 
-export class UserController {
 
-    private userService: IUserService;
+export interface IUserController {
 
-    constructor() {
+    createUser: (request: Request, response: Response, next: Function) => void;
+    deleteUser: (request: Request, response: Response, next: Function) => void;
+    updateUser: (request: Request, response: Response, next: Function) => void;
+    getUser: (request: Request, response: Response, next: Function) => void;
+    getUsers: (request: Request, response: Response, next: Function) => void;
+}
 
-        this.userService = container.get("IUserService") as IUserService;
+@injectable()
+export class UserController implements IUserController {
+
+    constructor(
+        @inject("IUserService") private userService: IUserService
+    ) {
     }
 
-    createUser = (request: Request, response: Response, next: Function) => {
+    createUser = (request: Request, response: Response, next: Function): void => {
 
         const username = request.body.username;
         const password = request.body.password;
@@ -21,7 +30,7 @@ export class UserController {
             .then(result => response.json(result));
     }
 
-    deleteUser = (request: Request, response: Response, next: Function) => {
+    deleteUser = (request: Request, response: Response, next: Function): void => {
 
         const userid = request.body.userid;
 
@@ -29,7 +38,7 @@ export class UserController {
             .then(result => response.json(result));
     }
 
-    updateUser = (request: Request, response: Response, next: Function) => {
+    updateUser = (request: Request, response: Response, next: Function): void => {
 
         const user: User = request.body;
 

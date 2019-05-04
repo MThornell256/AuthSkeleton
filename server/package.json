@@ -10,8 +10,8 @@
     "start": "node ./build/bundle.js",
     "start:dev": "nodemon --inspect .\\build\\bundle.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Mathew A Thornell",
+  "license": "MIT",
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
     "@types/express": "^4.16.1",

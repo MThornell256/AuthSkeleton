@@ -1,13 +1,17 @@
-import * as jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken';
+import { injectable } from "inversify";
 
-import { User } from '../Model/user';
+import { TokenData } from "../Models/tokenData";
+import { User } from '../Models/user';
 
-export interface TokenData {
-    id: number,
-    username:string,
+
+export interface IAuthService {
+    
+    getToken: (user: User) => string;
+    authenticate: (token: string) => TokenData;
 }
-
-export class AuthService { 
+@injectable()
+export class AuthService implements IAuthService { 
 
     private SECRET_KEY =  process.env.SECRET_KEY || 'defaultSecretKey';
 
