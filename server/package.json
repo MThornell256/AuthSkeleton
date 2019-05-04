@@ -2,13 +2,12 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": ".\\build\\bundle.js",
+  "main": "./build/bundle.js",
   "scripts": {
     "build": "webpack",
     "build:dev": "webpack -w --mode=development",
-    "build:d": "webpack --mode=development",
     "start": "node ./build/bundle.js",
-    "start:dev": "nodemon --inspect .\\build\\bundle.js"
+    "start:dev": "nodemon --inspect"
   },
   "author": "Mathew A Thornell",
   "license": "MIT",
@@ -20,6 +19,7 @@
     "@types/node": "^11.13.7",
     "@types/pg": "^7.4.14",
     "@types/sequelize": "^4.27.48",
+    "nodemon": "^1.19.0",
     "ts-loader": "^5.4.3",
     "typescript": "^3.4.5",
     "webpack": "^4.30.0",

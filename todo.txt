@@ -1,16 +1,5 @@
 TODO:
 
-Setup TS Lint To Work Properly
-Look up how es6 Modules Work
-
-Users - Controller Layer
-Users - Service Layer
-Users - Data Layer
-
+Jest Tests
 Database Migrations
-
-Controller Error Handling
-
-Error Handling Around Auth
-
-use '/user/{id}' syntax for get requests
+Setup TS Lint
