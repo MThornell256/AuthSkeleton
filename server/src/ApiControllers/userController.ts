@@ -9,7 +9,6 @@ export interface IUserController {
     createUser: (request: Request, response: Response, next: Function) => void;
     deleteUser: (request: Request, response: Response, next: Function) => void;
     updateUser: (request: Request, response: Response, next: Function) => void;
-    getUser: (request: Request, response: Response, next: Function) => void;
     getUsers: (request: Request, response: Response, next: Function) => void;
 }
 
@@ -46,32 +45,26 @@ export class UserController implements IUserController {
             .then(result => response.json(result));
     }
 
-    getUser = (request: Request, response: Response, next: Function): void => {
+    getUsers = (request: Request, response: Response, next: Function): void => {
 
         const user: User = {
             userid: request.query['userid'],
             username: request.query['username'],
         }
 
-        let query;
-        if((user.userid && user.username) || (!user.userid && !user.password)) {
-            
-            throw Error('cant filter on two/no unique criteria');
-        } else if (user.userid) {
-            
+        let query: Promise<User | User[]>;
+        if (user.userid) {
+
             query = this.userService.getUserById(user.userid);
         } else if (user.username) {
             
             query = this.userService.getUserByUsername(user.username);
+        } else {
+
+            query = this.userService.getUsers();
         }
-        
+
         query
-            .then(result => response.json(result));
-    }
-
-    getUsers = (request: Request, response: Response, next: Function): void => {
-
-        this.userService.getUsers()
-            .then(users => response.json(users));
+            .then((users: any) => response.json(users));
     }
 }

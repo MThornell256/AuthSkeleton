@@ -27,7 +27,7 @@ export class UserService implements IUserService {
             password
         };
 
-        return this.userRepository.upsert(newUser);
+        return this.userRepository.insert(newUser);
     }
 
     getUsers(): Promise<User[]> {
@@ -49,7 +49,7 @@ export class UserService implements IUserService {
 
     updateUser(user: User): Promise<User[]> {
 
-        return this.userRepository.upsert(user);
+        return this.userRepository.update(user);
     }
 
     deleteUser(id: number): Promise<boolean> {

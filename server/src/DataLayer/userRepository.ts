@@ -6,7 +6,8 @@ import { User } from "Models/user";
 
 export interface IUserRepository {
     get: (filterOptions?: User) => Promise<User[]>;
-    upsert: (data: User) => Promise<User[]>;
+    insert: (data: User) => Promise<User[]>;
+    update: (data: User) => Promise<User[]>;    
     delete: (id: number) => Promise<boolean>;
 }
 
@@ -42,13 +43,29 @@ export class UserRepository implements IUserRepository {
         return Promise.resolve(bbPromise);
     }
 
-    upsert(data: User): Promise<User[]> {
+    insert(data: User): Promise<User[]> {
 
         const bbPromise = this.usersContext
             .upsert(data, {
-                returning: true
+
+                returning: true,
             })
             .then((dtoResults: [QueryResult, boolean]) => this.mapResult([dtoResults[0]]));
+
+        return Promise.resolve(bbPromise);
+    }
+
+    update(data: User): Promise<User[]>  {
+
+        const userid = data.userid;
+        data.userid = undefined;
+
+        const bbPromise = this.usersContext
+            .update(data, {
+                where: { userid },
+                returning: true
+            })
+            .then((dtoResults: [number, QueryResult[]]) => this.mapResult(dtoResults[1]));
 
         return Promise.resolve(bbPromise);
     }

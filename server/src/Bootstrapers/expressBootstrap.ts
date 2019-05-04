@@ -38,7 +38,6 @@ app.get('/api/user', userController.getUsers);
 app.post('/api/user', userController.createUser);
 app.patch('/api/user', userController.updateUser);
 app.delete('/api/user', userController.deleteUser);
-app.get('/api/user/*', userController.getUser);
 
 // Error handlers
 app.use(errorController.notFoundError);
