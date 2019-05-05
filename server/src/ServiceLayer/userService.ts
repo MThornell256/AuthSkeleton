@@ -4,13 +4,14 @@ import { User } from "../Models/user";
 import { IAuthService } from "./authService";
 
 export interface IUserService {
-    createUser: (username: string, password: string) => Promise<User[]>
-    getUsers: () => Promise<User[]> 
-    getUserById: (userid: number) => Promise<User> 
-    getUserByUsername: (username: string) => Promise<User> 
-    updateUser: (user: User) => Promise<User[]> 
-    deleteUser: (id: number) => Promise<boolean> 
 
+    createUser: (username: string, password: string) => Promise<User[]>;
+    getUsers: () => Promise<User[]>;
+    getUserById: (userid: number) => Promise<User>;
+    getUserByUsername: (username: string) => Promise<User>;
+    updateUser: (user: User) => Promise<User[]>;
+    deleteUser: (id: number) => Promise<boolean>;
+    updateUserLoginStatus: (user: User, successfulLogin: boolean) => Promise<User[]>;
 }
 
 @injectable()
@@ -67,6 +68,26 @@ export class UserService implements IUserService {
         };
         
         return this.userRepository.update(userData);
+    }
+
+    updateUserLoginStatus(user: User, successfulLogin: boolean): Promise<User[]> {
+
+        let {
+            userid,
+            failedLogins,
+            lastFailedLogin,
+            lastLogin
+        } = user ;
+        
+        if(successfulLogin) {
+            failedLogins = 0;
+            lastLogin = new Date();
+        } else {
+            failedLogins++;
+            lastFailedLogin = new Date();
+        }
+
+        return this.userRepository.update({ userid, failedLogins, lastFailedLogin, lastLogin })
     }
 
     private stripPasswordData(user: User): User {

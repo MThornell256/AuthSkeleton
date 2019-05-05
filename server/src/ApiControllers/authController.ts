@@ -32,40 +32,43 @@ export class AuthController implements IAuthController {
         const password: string = request.body.password;
 
         if (!username || !password) {
+            // TODO:
             // Error username or password do not exist
         }
 
         this.userService.getUserByUsername(username).then((user: User) => {
 
+            if(!user) {
+                // TODO:
+                // User dosn't exist
+                // Error "Username or password is incorrect"
+            }
+            
             // Check Failed Login Cooldown
-            if(user.failedLogins > this.maxFailedLogins) {
+            if(user.failedLogins >= this.maxFailedLogins) {
 
-                // TODO: Finsih This:
                 const currentDateTime = moment();
-                const lastFailedLogin = moment(user.lastFailedLogin);
-                const thresholdTime = lastFailedLogin.add(this.failedLoginCooldown, 'minutes').calendar();
+                const lockoutExpiry   = moment(user.lastFailedLogin).add(this.failedLoginCooldown, 'minutes')
 
-                console.log("currentDateTime: " + currentDateTime)
-                console.log("lastFailedLogin: " + lastFailedLogin)
-                console.log("thresholdTime: " + thresholdTime)
-
-                // if(currentTime < thresholdTime) {
-                //     // Error
-                // }
+                if(currentDateTime < lockoutExpiry) {
+                    // TODO:
+                    response.status(401).json({ error: `Too Many Failed Logins - 5 min lockout; ${(lockoutExpiry - currentDateTime) * 0.001} sec remaining` });
+                    return;
+                }
             }
 
             // Verify Password
             if(!this.authService.verifyPassword(user, password)) {
 
+                // TODO:
                 // Error "Username or password is incorrect"
-                // TODO: Increase Failed Login Info In Database
+                this.userService.updateUserLoginStatus(user, false);
                 response.status(401).json({ error: "error- unauth" });
                 return;
             }
 
-            // TODO: Update Login Info In Database
-
-            // Issue Token
+            // Record Successful Login and Issue Token
+            this.userService.updateUserLoginStatus(user, true);
             const token = this.authService.getToken(user);
             response.json({ token });
         });
@@ -79,6 +82,7 @@ export class AuthController implements IAuthController {
 
         const authHeader = request.header("authorization");
         if(!authHeader) {
+            // TODO:
             // No Auth Header Exists
         }
 
@@ -98,6 +102,7 @@ export class AuthController implements IAuthController {
             next();
         
         } catch (err) {
+            // TODO:
             throw {
                 message: err.message,
                 status: 401,
@@ -105,4 +110,17 @@ export class AuthController implements IAuthController {
             } as ControllerError;
         }
     };
+
+    bindLoggedInUser = (
+        request: Request,
+        response: Response,
+        next: Function
+    ): void => {
+        const userid = (request as any).tokenData.userid;
+        this.userService.getUserById(userid)
+            .then((user: User) => {
+                (request as any).user = user;
+                next();
+            });
+    }
 }

@@ -3,3 +3,5 @@ TODO:
 Jest Tests
 Database Migrations
 Setup TS Lint
+
+Error Handling 

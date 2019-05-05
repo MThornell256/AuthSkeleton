@@ -7,7 +7,7 @@ import { User } from '../Models/user';
 
 
 export interface IAuthService {
-    
+
     getToken: (user: User) => string;
     authenticate: (token: string) => TokenData;
     getPasswordHash: (password: string, passwordSalt: string) => string;
@@ -15,7 +15,7 @@ export interface IAuthService {
     verifyPassword: (user: User, password: string) => boolean;
 }
 @injectable()
-export class AuthService implements IAuthService { 
+export class AuthService implements IAuthService {
 
     private SECRET_KEY =  process.env.SECRET_KEY || 'defaultSecretKey';
 
@@ -49,7 +49,7 @@ export class AuthService implements IAuthService {
         return createHmac('sha256', password+passwordSalt)
                    .digest('hex');
     }
-
+ 
     generateSalt(): string {
         // Produce Random String
         // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript

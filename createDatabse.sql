@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS public.users (
 	username VARCHAR(50) UNIQUE NOT NULL,
 	passwordHash VARCHAR(128) NOT NULL,
 	passwordSalt VARCHAR(64) NOT NULL,
-	failedLogins INTEGER,
-	lastFailedLogin TIMESTAMP,
-	lastLogin TIMESTAMP,
+	failedLogins INTEGER NOT NULL DEFAULT(0),
+	lastFailedLogin TIMESTAMPTZ,
+	lastLogin TIMESTAMPTZ,
 	PRIMARY KEY (userid)
 )
 
