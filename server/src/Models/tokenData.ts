@@ -1,5 +1,5 @@
 
 export interface TokenData {
-    id: number,
+    userid: number,
     username:string,
 }

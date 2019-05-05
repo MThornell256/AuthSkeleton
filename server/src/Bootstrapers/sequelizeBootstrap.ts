@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, DefineAttributeColumnOptions } from 'sequelize';
 
 // Sequelize Docs
 // http://docs.sequelizejs.com/
@@ -14,7 +14,7 @@ export const SequelizeOrm: Sequelize = new Sequelize(dbConnectionString, {
 
 
 // Register Mappings
-const defaultPK = {type: Sequelize.INTEGER, primaryKey: true} ;
+const defaultPK: DefineAttributeColumnOptions = {type: Sequelize.INTEGER, primaryKey: true};
 const defaultOptions = {
     updatedAt: false,
     createdAt: false,
@@ -23,8 +23,12 @@ const defaultOptions = {
 
 export const UserDto = SequelizeOrm.define('User', {
     userid: defaultPK,
-    username: Sequelize.STRING,
-    password: Sequelize.STRING
+    username: Sequelize.STRING(50),
+    passwordHash: Sequelize.STRING(256),
+    passwordSalt: Sequelize.STRING(10),
+    failedLogins: Sequelize.NUMBER,
+    lastFailedLogin: Sequelize.DATE,
+    FailedLogin: Sequelize.DATE
 }, {
     ...defaultOptions, 
     tableName: 'users'

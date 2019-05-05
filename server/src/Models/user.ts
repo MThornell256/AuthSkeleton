@@ -2,5 +2,9 @@
 export interface User {
     userid?: number;
     username?: string;
-    password?: string;
+    passwordHash?: string;
+    passwordSalt?: string;
+    failedLogins?: number;
+    lastFailedLogin?: Date;
+    lastLogin?: Date;
 }

@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { IUserRepository } from "../DataLayer/userRepository";
 import { User } from "../Models/user";
+import { IAuthService } from "./authService";
 
 export interface IUserService {
     createUser: (username: string, password: string) => Promise<User[]>
@@ -16,7 +17,8 @@ export interface IUserService {
 export class UserService implements IUserService {
 
     constructor(
-        @inject('IUserRepository') private userRepository: IUserRepository
+        @inject('IUserRepository') private userRepository: IUserRepository,
+        @inject('IAuthService') private authService: IAuthService
     ) {
     }
 
@@ -24,7 +26,7 @@ export class UserService implements IUserService {
 
         const newUser: User = {
             username,
-            password
+            ...this.generatePasswordData(password)
         };
 
         return this.userRepository.insert(newUser);
@@ -49,11 +51,39 @@ export class UserService implements IUserService {
 
     updateUser(user: User): Promise<User[]> {
 
-        return this.userRepository.update(user);
+        return this.userRepository.update(this.stripPasswordData(user));
     }
 
     deleteUser(id: number): Promise<boolean> {
 
         return this.userRepository.delete(id);
+    }
+
+    updatePassword(userid: number, password: string): Promise<User[]> {
+
+        const userData: User = {
+            userid,
+            ...this.generatePasswordData(password)
+        };
+        
+        return this.userRepository.update(userData);
+    }
+
+    private stripPasswordData(user: User): User {
+
+        user.passwordHash = undefined;
+        user.passwordSalt = undefined;
+        return user;
+    }
+
+    private generatePasswordData(password: string): User {
+
+        const passwordSalt = this.authService.generateSalt();
+        const passwordHash = this.authService.getPasswordHash(password, passwordSalt);
+
+        return {
+            passwordHash,
+            passwordSalt,
+        };
     }
 }
