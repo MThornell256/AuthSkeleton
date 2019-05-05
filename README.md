@@ -8,5 +8,5 @@ A ready-to-go skeleton project backend server for NodeJS.
 - Web Server (ExpressJs)
 - IOC Containers (InversifyJs)
 - ORM/Postgres (SequelizeJs)
-- Database Migration (SequelizeJs)
 - JWT Authentication (JsonWebToken)
+

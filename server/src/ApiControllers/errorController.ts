@@ -1,5 +1,6 @@
 import { injectable } from "inversify";
 import { Request, Response } from 'express';
+import { createError, internalError } from "./controllerErrorHelpers";
 
 export interface IErrorController {
     notFoundError: (request: Request, response: Response, next: Function) => void
@@ -8,29 +9,66 @@ export interface IErrorController {
 
 export interface ControllerError {
 
-    message: string,
-    status: number,
-    stack: string,
+    error: boolean;
+    status: number;
+    message: string;
+    type: string;
+    logError: boolean;
+    innerError: any;
 }
 
 @injectable()
 export class ErrorController implements IErrorController {
 
     notFoundError = (request: Request, response: Response, next: Function) => {
-        throw {
-            message: "404 Not Found",
-            status: 404,
-        };
+        throw createError("Not Found", 404);
     }
 
     error = (error: any, req: Request, res: Response, next: Function) => {
-        console.log('Error Handler');
 
-        res.status(error.status || 500);
-        res.json({
-            message: error.message,
-            status: error.status,
-            stackTrace: error.stack
-        });
+        // If Not A Controller Error Wrap It In One
+        if(!error.error) {
+            error = internalError(error, "Unhandeled Error");
+        }
+
+        // If innerError is actually an 'Error' change it to an object;
+        // Error objects dont serialize to JSON Properly
+        error.innerError = error.innerError instanceof Error
+            ? this.errorToObject(error.innerError)
+            : error.innerError;
+
+        if(error.logError) {
+
+            this.logError(error);
+        }
+
+        const isDev = true;
+        if(!isDev) {
+            // Sanitize Error
+            error.type = undefined;
+            error.innerError = undefined;
+        }
+
+        // TODO: If Prod Then Sanitise Error
+        // TODO: Log Error
+        res.status(error.status);
+        res.json(error);
+        return;
+    }
+
+    private errorToObject(error: Error): any {
+
+        const errorAsObj: any = {};
+        const keys = Object.getOwnPropertyNames(error);
+        
+        for(const key of keys) {
+            errorAsObj[key] = (error as any)[key]
+        }
+        
+        return errorAsObj;
+    }
+
+    private logError(error: ControllerError): void {
+        // TODO:
     }
 }

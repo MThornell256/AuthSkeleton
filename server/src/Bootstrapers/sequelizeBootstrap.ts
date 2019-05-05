@@ -11,8 +11,6 @@ export const SequelizeOrm: Sequelize = new Sequelize(dbConnectionString, {
     protocol: 'postgres',
 });
 
-
-
 // Register Mappings
 const defaultPK: DefineAttributeColumnOptions = {type: Sequelize.INTEGER, primaryKey: true};
 const defaultOptions = {
@@ -31,7 +29,8 @@ export const UserDto = SequelizeOrm.define('User', {
     lastLogin: { type: Sequelize.DATE, field: 'lastlogin'},
 }, {
     ...defaultOptions, 
-    tableName: 'users'
+    tableName: 'users',
+    rejectOnError: true
 });
 
 // connect to the database

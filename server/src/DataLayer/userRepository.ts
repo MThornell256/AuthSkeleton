@@ -3,6 +3,7 @@ import { QueryResult } from "pg";
 import { DestroyOptions } from "sequelize";
 import { UserDto } from "../Bootstrapers/sequelizeBootstrap";
 import { User } from "Models/user";
+import { databaseError } from "../ApiControllers/controllerErrorHelpers";
 
 export interface IUserRepository {
     get: (filterOptions?: User) => Promise<User[]>;
@@ -40,11 +41,10 @@ export class UserRepository implements IUserRepository {
             .findAll({
                 where: filterOptions
             })
-            .then(
-                (dtoResults: QueryResult[]) => this.mapResult(dtoResults)
-            );
+            .then((dtoResults: QueryResult[]) => this.mapResult(dtoResults));
 
-        return Promise.resolve(bbPromise);
+        return Promise.resolve(bbPromise)
+            .catch(error => {throw databaseError(error)});
     }
 
     insert(data: User): Promise<User[]> {
@@ -55,7 +55,8 @@ export class UserRepository implements IUserRepository {
             })
             .then((dtoResults: [QueryResult, boolean]) => this.mapResult([dtoResults[0]]));
 
-        return Promise.resolve(bbPromise);
+        return Promise.resolve(bbPromise)
+            .catch(error => {throw databaseError(error)});
     }
 
     update(data: User): Promise<User[]>  {
@@ -70,7 +71,8 @@ export class UserRepository implements IUserRepository {
             })
             .then((dtoResults: [number, QueryResult[]]) => this.mapResult(dtoResults[1]));
 
-        return Promise.resolve(bbPromise);
+        return Promise.resolve(bbPromise)
+            .catch(error => {throw databaseError(error)});
     }
 
     delete(id: number): Promise<boolean> {
@@ -81,8 +83,9 @@ export class UserRepository implements IUserRepository {
         
         const bbPromise = this.usersContext
             .destroy(options)
-            .then((result: number) => (result > 0))
-        
-        return Promise.resolve(bbPromise);
+            .then((result: number) => (result > 0));
+
+        return Promise.resolve(bbPromise)
+            .catch(error => {throw databaseError(error)});
     }
 }

@@ -1,11 +1,16 @@
-import * as moment from 'moment';
+import * as moment from "moment";
 
 import { inject, injectable } from "inversify";
 import { Request, Response } from "express";
 import { User } from "Models/user";
-import { ControllerError } from "./errorController";
 import { IAuthService } from "ServiceLayer/authService";
 import { IUserService } from "ServiceLayer/userService";
+import {
+    missingParametersError,
+    wrapError,
+    createError,
+    internalError
+} from "./controllerErrorHelpers";
 
 export interface IAuthController {
     login: (request: Request, response: Response, next: Function) => void;
@@ -18,9 +23,8 @@ export interface IAuthController {
 
 @injectable()
 export class AuthController implements IAuthController {
-
-    private maxFailedLogins = 5;                // Count Failed Logins
-    private failedLoginCooldown = 5;            // Cooldown Time In Mins
+    private maxFailedLogins = 5; // Count Failed Logins
+    private failedLoginCooldown = 5; // Cooldown Time In Mins
 
     constructor(
         @inject("IAuthService") private authService: IAuthService,
@@ -32,45 +36,54 @@ export class AuthController implements IAuthController {
         const password: string = request.body.password;
 
         if (!username || !password) {
-            // TODO:
-            // Error username or password do not exist
+            throw missingParametersError(["username", "password"]);
         }
 
         this.userService.getUserByUsername(username).then((user: User) => {
-
-            if(!user) {
-                // TODO:
-                // User dosn't exist
-                // Error "Username or password is incorrect"
+            if (!user) {
+                next(createError("The Username Or Password Is Incorrect", 401));
+                return;
             }
-            
+
             // Check Failed Login Cooldown
-            if(user.failedLogins >= this.maxFailedLogins) {
-
+            if (user.failedLogins >= this.maxFailedLogins) {
                 const currentDateTime = moment();
-                const lockoutExpiry   = moment(user.lastFailedLogin).add(this.failedLoginCooldown, 'minutes')
+                const lockoutExpiry = moment(user.lastFailedLogin).add(
+                    this.failedLoginCooldown,
+                    "minutes"
+                );
 
-                if(currentDateTime < lockoutExpiry) {
-                    // TODO:
-                    response.status(401).json({ error: `Too Many Failed Logins - 5 min lockout; ${(lockoutExpiry - currentDateTime) * 0.001} sec remaining` });
+                if (currentDateTime < lockoutExpiry) {
+                    next(createError( `Too Many Failed Logins. Lockout Time: ${this.failedLoginCooldown} mins`, 401));
                     return;
                 }
             }
 
             // Verify Password
-            if(!this.authService.verifyPassword(user, password)) {
-
-                // TODO:
+            if (!this.authService.verifyPassword(user, password)) {
                 // Error "Username or password is incorrect"
-                this.userService.updateUserLoginStatus(user, false);
-                response.status(401).json({ error: "error- unauth" });
+                this.userService
+                    .updateUserLoginStatus(user, false)
+                    .then((user: User[]) => next(createError("The Username Or Password Is Incorrect", 401)))
+                    .catch(error => next(error));
                 return;
             }
 
             // Record Successful Login and Issue Token
-            this.userService.updateUserLoginStatus(user, true);
-            const token = this.authService.getToken(user);
-            response.json({ token });
+            let token: String;
+            try {
+                token = this.authService.getToken(user);
+            } catch (error) {
+                next(internalError(error, "Token Signing"));
+                return;
+            }
+
+            this.userService
+                .updateUserLoginStatus(user, true)
+                .then(() => {
+                    response.json({ token });
+                })
+                .catch(error => next(error));
         });
     };
 
@@ -79,35 +92,27 @@ export class AuthController implements IAuthController {
         response: Response,
         next: Function
     ): void => {
-
         const authHeader = request.header("authorization");
-        if(!authHeader) {
-            // TODO:
-            // No Auth Header Exists
+        if (!authHeader) {
+            throw missingParametersError(["authorization"]);
         }
 
         const token = authHeader.startsWith("Bearer ")
             ? authHeader.split(" ")[1]
             : undefined;
-        
-        if(!token) {
+
+        if (!token) {
             // Token is not prefixed with 'Bearer'
             // or Token is an empty string.
-            // TODO: -> Invalid Auth Token (401)
+            throw createError("Invalid Auth Token", 401);
         }
-        
+
         try {
             // Put the token data onto the request so it can be accessed down the chain
             (request as any).tokenData = this.authService.authenticate(token);
             next();
-        
         } catch (err) {
-            // TODO:
-            throw {
-                message: err.message,
-                status: 401,
-                stack: err.stack
-            } as ControllerError;
+            throw wrapError(err, "Unable To Authenticate", 401);
         }
     };
 
@@ -117,10 +122,9 @@ export class AuthController implements IAuthController {
         next: Function
     ): void => {
         const userid = (request as any).tokenData.userid;
-        this.userService.getUserById(userid)
-            .then((user: User) => {
-                (request as any).user = user;
-                next();
-            });
-    }
+        this.userService.getUserById(userid).then((user: User) => {
+            (request as any).user = user;
+            next();
+        });
+    };
 }
