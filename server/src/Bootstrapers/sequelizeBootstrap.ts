@@ -24,11 +24,11 @@ const defaultOptions = {
 export const UserDto = SequelizeOrm.define('User', {
     userid: defaultPK,
     username: Sequelize.STRING(50),
-    passwordHash: Sequelize.STRING(256),
-    passwordSalt: Sequelize.STRING(10),
-    failedLogins: Sequelize.NUMBER,
-    lastFailedLogin: Sequelize.DATE,
-    FailedLogin: Sequelize.DATE
+    passwordHash: { type: Sequelize.STRING(128), field: 'passwordhash'},
+    passwordSalt: { type: Sequelize.STRING(64), field: 'passwordsalt'},
+    failedLogins: { type: Sequelize.INTEGER, field: 'failedlogins'},
+    lastFailedLogin: { type: Sequelize.DATE, field: 'lastfailedlogin'},
+    lastLogin: { type: Sequelize.DATE, field: 'lastlogin'},
 }, {
     ...defaultOptions, 
     tableName: 'users'

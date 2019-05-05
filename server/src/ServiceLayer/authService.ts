@@ -54,7 +54,9 @@ export class AuthService implements IAuthService {
         // Produce Random String
         // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 
-        return Math.random().toString(36).substring(10);
+        const randomString = Math.random().toString(36).substring(2);
+        return createHmac('sha256', randomString)
+                   .digest('hex');
     }
 
     verifyPassword(user: User, password: string): boolean {

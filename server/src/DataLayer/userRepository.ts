@@ -21,10 +21,15 @@ export class UserRepository implements IUserRepository {
 
     mapResult(result: QueryResult[]): User[] {
         return result.map((result: any) => {
+            
             return {
                 userid: result.dataValues.userid,
                 username: result.dataValues.username,
-                password: result.dataValues.password
+                passwordHash: result.dataValues.passwordHash,
+                passwordSalt: result.dataValues.passwordSalt,
+                failedLogins: result.dataValues.failedLogins,
+                lastFailedLogin: result.dataValues.lastFailedLogin,
+                lastLogin: result.dataValues.lastLogin
             } as User;
         });
     }
@@ -33,7 +38,6 @@ export class UserRepository implements IUserRepository {
 
         const bbPromise = this.usersContext
             .findAll({
-                attributes: ["userid", "username", "password"],
                 where: filterOptions
             })
             .then(
@@ -47,7 +51,6 @@ export class UserRepository implements IUserRepository {
 
         const bbPromise = this.usersContext
             .upsert(data, {
-
                 returning: true,
             })
             .then((dtoResults: [QueryResult, boolean]) => this.mapResult([dtoResults[0]]));
