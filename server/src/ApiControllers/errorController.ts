@@ -1,14 +1,13 @@
-import { injectable } from "inversify";
+import { injectable } from 'inversify';
 import { Request, Response } from 'express';
-import { createError, internalError } from "./controllerErrorHelpers";
+import { createError, internalError } from './controllerErrorHelpers';
 
 export interface IErrorController {
-    notFoundError: (request: Request, response: Response, next: Function) => void
-    error: (error: any, request: Request, response: Response, next: Function) => void
+    notFoundError: (request: Request, response: Response, next: Function) => void;
+    error: (error: any, request: Request, response: Response, next: Function) => void;
 }
 
 export interface ControllerError {
-
     error: boolean;
     status: number;
     message: string;
@@ -19,31 +18,26 @@ export interface ControllerError {
 
 @injectable()
 export class ErrorController implements IErrorController {
-
     notFoundError = (request: Request, response: Response, next: Function) => {
-        throw createError("Not Found", 404);
-    }
+        throw createError('Not Found', 404);
+    };
 
     error = (error: any, req: Request, res: Response, next: Function) => {
-
         // If Not A Controller Error Wrap It In One
-        if(!error.error) {
-            error = internalError(error, "Unhandeled Error");
+        if (!error.error) {
+            error = internalError(error, 'Unhandeled Error');
         }
 
         // If innerError is actually an 'Error' change it to an object;
         // Error objects dont serialize to JSON Properly
-        error.innerError = error.innerError instanceof Error
-            ? this.errorToObject(error.innerError)
-            : error.innerError;
+        error.innerError = error.innerError instanceof Error ? this.errorToObject(error.innerError) : error.innerError;
 
-        if(error.logError) {
-
+        if (error.logError) {
             this.logError(error);
         }
 
         const isDev = true;
-        if(!isDev) {
+        if (!isDev) {
             // Sanitize Error
             error.type = undefined;
             error.innerError = undefined;
@@ -54,17 +48,16 @@ export class ErrorController implements IErrorController {
         res.status(error.status);
         res.json(error);
         return;
-    }
+    };
 
     private errorToObject(error: Error): any {
-
         const errorAsObj: any = {};
         const keys = Object.getOwnPropertyNames(error);
-        
-        for(const key of keys) {
-            errorAsObj[key] = (error as any)[key]
+
+        for (const key of keys) {
+            errorAsObj[key] = (error as any)[key];
         }
-        
+
         return errorAsObj;
     }
 

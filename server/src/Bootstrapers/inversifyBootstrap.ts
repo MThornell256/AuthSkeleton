@@ -9,6 +9,7 @@ import { UserService } from "../ServiceLayer/userService";
 import { AuthController } from "../ApiControllers/authController";
 import { UserController } from "../ApiControllers/userController";
 import { ErrorController } from "../ApiControllers/errorController";
+import { UserDto } from "./sequelizeBootstrap";
 
 export const container = new Container();
 
@@ -23,3 +24,5 @@ container.bind("IUserService").to(UserService).inSingletonScope();
 
 // Repositories
 container.bind("IUserRepository").to(UserRepository).inSingletonScope();
+
+container.bind("Model.User").toConstantValue(UserDto);
