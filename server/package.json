@@ -1,40 +1,45 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./build/bundle.js",
-  "scripts": {
-    "build": "webpack",
-    "build:dev": "webpack -w --mode=development",
-    "start": "node ./build/bundle.js",
-    "start:dev": "nodemon --inspect"
-  },
-  "author": "Mathew A Thornell",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/body-parser": "^1.17.0",
-    "@types/express": "^4.16.1",
-    "@types/inversify": "^2.0.33",
-    "@types/jsonwebtoken": "^8.3.2",
-    "@types/moment": "^2.13.0",
-    "@types/node": "^11.13.7",
-    "@types/pg": "^7.4.14",
-    "@types/sequelize": "^4.27.48",
-    "nodemon": "^1.19.0",
-    "ts-loader": "^5.4.3",
-    "typescript": "^3.4.5",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.1",
-    "webpack-node-externals": "^1.7.2"
-  },
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "express": "^4.16.4",
-    "inversify": "^5.0.1",
-    "jsonwebtoken": "^8.5.1",
-    "moment": "^2.24.0",
-    "pg": "^7.10.0",
-    "reflect-metadata": "^0.1.13",
-    "sequelize": "^5.8.4"
-  }
+    "name": "server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./build/bundle.js",
+    "scripts": {
+        "build": "webpack --mode=production",
+        "build:dev": "webpack -w --mode=development",
+        "start": "node ./build/bundle.js",
+        "start:dev": "nodemon --inspect",
+        "test": "jest",
+        "test:dev": "jest --watch"
+    },
+    "author": "Mathew A Thornell",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/body-parser": "^1.17.0",
+        "@types/express": "^4.16.1",
+        "@types/inversify": "^2.0.33",
+        "@types/jest": "^24.0.13",
+        "@types/jsonwebtoken": "^8.3.2",
+        "@types/moment": "^2.13.0",
+        "@types/node": "^11.13.7",
+        "@types/pg": "^7.4.14",
+        "@types/sequelize": "^4.27.48",
+        "jest": "^24.8.0",
+        "nodemon": "^1.19.0",
+        "ts-jest": "^24.0.2",
+        "ts-loader": "^5.4.3",
+        "typescript": "^3.4.5",
+        "webpack": "^4.30.0",
+        "webpack-cli": "^3.3.1",
+        "webpack-node-externals": "^1.7.2"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "express": "^4.16.4",
+        "inversify": "^5.0.1",
+        "jsonwebtoken": "^8.5.1",
+        "moment": "^2.24.0",
+        "pg": "^7.10.0",
+        "reflect-metadata": "^0.1.13",
+        "sequelize": "^5.8.4"
+    }
 }
