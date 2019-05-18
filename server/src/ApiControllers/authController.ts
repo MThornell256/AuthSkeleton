@@ -6,6 +6,7 @@ import { IUserService } from 'ServiceLayer/userService';
 import { IAuthService } from 'ServiceLayer/authService';
 import { User } from 'Models/user';
 import { missingParametersError, wrapError, createError, internalError } from './controllerErrorHelpers';
+import { TokenData } from 'Models/tokenData';
 
 export interface IAuthController {
     login: (request: Request, response: Response, next: Function) => void;
@@ -75,7 +76,7 @@ export class AuthController implements IAuthController {
         });
     };
 
-    authenticate = (request: Request, response: Response, next: Function): void => {
+    authenticate = (request: Request & { tokenData?: TokenData }, response: Response, next: Function): void => {
         const authHeader = request.header('authorization');
         if (!authHeader) {
             throw missingParametersError(['authorization']);
@@ -91,18 +92,26 @@ export class AuthController implements IAuthController {
 
         try {
             // Put the token data onto the request so it can be accessed down the chain
-            (request as any).tokenData = this.authService.authenticate(token);
+            request.tokenData = this.authService.authenticate(token);
             next();
         } catch (err) {
             throw wrapError(err, 'Unable To Authenticate', 401);
         }
     };
 
-    bindLoggedInUser = (request: Request, response: Response, next: Function): void => {
-        const userid = (request as any).tokenData.userid;
-        this.userService.getUserById(userid).then((user: User) => {
-            (request as any).user = user;
-            next();
-        });
+    bindLoggedInUser = (
+        request: Request & { tokenData?: TokenData; user?: User },
+        response: Response,
+        next: Function
+    ): void => {
+        if (request.tokenData) {
+            const id = request.tokenData.userid;
+            this.userService.getUserById(id).then((user: User) => {
+                request.user = user;
+                next();
+            });
+        } else {
+            // throw error
+        }
     };
 }

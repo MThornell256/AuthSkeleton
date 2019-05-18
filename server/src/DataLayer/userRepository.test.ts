@@ -5,7 +5,7 @@ import { IUserRepository, UserRepository } from './userRepository';
 import { User } from 'Models/user';
 
 const mockUser: User = {
-    userid: 666,
+    id: 666,
     username: 'user',
     passwordHash: 'PasswordHash',
     passwordSalt: 'PasswordSalt'
@@ -38,7 +38,7 @@ describe('User Repository', () => {
         userRepository.get().then((result) => {
             expect(mockUserContext.findAll).toBeCalled();
             expect(result.length).toBeGreaterThan(0);
-            expect(result[0].userid).toBe(666);
+            expect(result[0].id).toBe(666);
             done();
         });
     });
@@ -47,7 +47,7 @@ describe('User Repository', () => {
         userRepository.insert(mockUser).then((result) => {
             expect(mockUserContext.upsert).toBeCalled();
             expect(result.length).toBeGreaterThan(0);
-            expect(result[0].userid).toBe(666);
+            expect(result[0].id).toBe(666);
             done();
         });
     });
@@ -56,7 +56,7 @@ describe('User Repository', () => {
         userRepository.update(mockUser).then((result) => {
             expect(mockUserContext.update).toBeCalled();
             expect(result.length).toBeGreaterThan(0);
-            expect(result[0].userid).toBe(666);
+            expect(result[0].id).toBe(666);
             done();
         });
     });

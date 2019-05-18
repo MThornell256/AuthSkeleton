@@ -6,7 +6,7 @@ import { IAuthService } from './authService';
 export interface IUserService {
     createUser: (username: string, password: string) => Promise<User[]>;
     getUsers: () => Promise<User[]>;
-    getUserById: (userid: number) => Promise<User>;
+    getUserById: (id: number) => Promise<User>;
     getUserByUsername: (username: string) => Promise<User>;
     updateUser: (user: User) => Promise<User[]>;
     deleteUser: (id: number) => Promise<boolean>;
@@ -33,8 +33,8 @@ export class UserService implements IUserService {
         return this.userRepository.get();
     }
 
-    getUserById(userid: number): Promise<User> {
-        return this.userRepository.get({ userid }).then((users) => users[0]);
+    getUserById(id: number): Promise<User> {
+        return this.userRepository.get({ id }).then((users) => users[0]);
     }
 
     getUserByUsername(username: string): Promise<User> {
@@ -49,9 +49,9 @@ export class UserService implements IUserService {
         return this.userRepository.delete(id);
     }
 
-    updatePassword(userid: number, password: string): Promise<User[]> {
+    updatePassword(id: number, password: string): Promise<User[]> {
         const userData: User = {
-            userid,
+            id,
             ...this.generatePasswordData(password)
         };
 
@@ -59,7 +59,7 @@ export class UserService implements IUserService {
     }
 
     updateUserLoginStatus(user: User, successfulLogin: boolean): Promise<User[]> {
-        let { userid, failedLogins = 0, lastFailedLogin, lastLogin } = user;
+        let { id, failedLogins = 0, lastFailedLogin, lastLogin } = user;
 
         if (successfulLogin) {
             failedLogins = 0;
@@ -69,7 +69,7 @@ export class UserService implements IUserService {
             lastFailedLogin = new Date();
         }
 
-        return this.userRepository.update({ userid, failedLogins, lastFailedLogin, lastLogin });
+        return this.userRepository.update({ id, failedLogins, lastFailedLogin, lastLogin });
     }
 
     private stripPasswordData(user: User): User {

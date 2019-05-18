@@ -19,12 +19,12 @@ export class AuthService implements IAuthService {
     getToken(user: User): string {
         // Remove any sensitive data from the user
 
-        if (!user.userid || !user.username) {
+        if (!user.id || !user.username) {
             throw Error('Username or Password is undefined');
         }
 
         const payload: TokenData = {
-            userid: user.userid,
+            userid: user.id,
             username: user.username
         };
 

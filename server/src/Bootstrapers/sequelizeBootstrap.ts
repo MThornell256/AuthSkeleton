@@ -24,7 +24,7 @@ const defaultOptions = {
 export const UserDto = SequelizeOrm.define(
     'User',
     {
-        userid: defaultPK,
+        id: { ...defaultPK, field: 'userid' },
         username: DataTypes.STRING(50),
         passwordHash: { type: DataTypes.STRING(128), field: 'passwordhash' },
         passwordSalt: { type: DataTypes.STRING(64), field: 'passwordsalt' },

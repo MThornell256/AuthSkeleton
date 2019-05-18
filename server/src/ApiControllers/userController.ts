@@ -30,14 +30,14 @@ export class UserController implements IUserController {
     };
 
     deleteUser = (request: Request, response: Response, next: Function): void => {
-        const userid = request.body.userid;
+        const id = request.body.id;
 
-        if (!userid) {
-            throw missingParametersError(['userid']);
+        if (!id) {
+            throw missingParametersError(['id']);
         }
 
         this.userService
-            .deleteUser(userid)
+            .deleteUser(id)
             .then((result) => response.json(result))
             .catch((error) => next(error));
     };
@@ -45,8 +45,8 @@ export class UserController implements IUserController {
     updateUser = (request: Request, response: Response, next: Function): void => {
         const user: User = request.body;
 
-        if (!user.userid) {
-            throw missingParametersError(['userid']);
+        if (!user.id) {
+            throw missingParametersError(['id']);
         }
 
         this.userService
@@ -57,13 +57,13 @@ export class UserController implements IUserController {
 
     getUsers = (request: Request, response: Response, next: Function): void => {
         const user: User = {
-            userid: request.query['userid'],
+            id: request.query['id'],
             username: request.query['username']
         };
 
         let query: Promise<User | User[]>;
-        if (user.userid) {
-            query = this.userService.getUserById(user.userid);
+        if (user.id) {
+            query = this.userService.getUserById(user.id);
         } else if (user.username) {
             query = this.userService.getUserByUsername(user.username);
         } else {
