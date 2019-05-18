@@ -1,6 +1,7 @@
 import { QueryResult } from 'pg';
 import { DestroyOptions } from 'sequelize';
 import { databaseError } from '../ApiControllers/controllerErrorHelpers';
+import { injectable } from 'inversify';
 
 export interface IDatabaseObject {
     id?: number;
@@ -13,6 +14,7 @@ export interface IRepository<T extends IDatabaseObject> {
     delete: (id: number) => Promise<boolean>;
 }
 
+@injectable()
 export abstract class BaseRepository<T extends IDatabaseObject> implements IRepository<T> {
     constructor(private usersContext: any) {}
 
